@@ -8,7 +8,12 @@
   };
 
   function isEditable(el) {
-    return el && (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT");
+    return el && (
+      el.isContentEditable ||
+      el.tagName === "TEXTAREA" ||
+      el.tagName === "INPUT" ||
+      el.getAttribute && el.getAttribute("data-lexical-editor") === "true"
+    );
   }
 
   function findWordBounds(text, offset) {
@@ -57,6 +62,7 @@
       newText = wrapper + selectedText + wrapper;
     }
 
+    // must have or add-on won't work
     document.execCommand("delete", false, null);
     document.execCommand("insertText", false, newText);
   }
@@ -84,13 +90,34 @@
     const selectedText = range.toString() || "";
     const blockText = `\n${WRAP.cb}\n${selectedText}\n${WRAP.cb}\n`;
 
+    // must have or add-on won't work
     document.execCommand("delete", false, null);
     document.execCommand("insertText", false, blockText);
+  }
+
+  function insertZwsp() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+
+    const selectedText = range.toString();
+    if (!selectedText) return;
+
+    const zwsp = "\u200B";
+    const withZwsp = selectedText.split("").join(zwsp);
+
+    // must have or add-on won't work
+    document.execCommand("delete", false, null);
+    document.execCommand("insertText", false, withZwsp);
   }
 
   function clearAllFormatting() {
     const active = document.activeElement;
     if (!isEditable(active)) return;
+
+    // only Facebook Chat and Messenger (at least better than nothing)
+    const allowedContainer = active && (active.contains('.x3jgonx') || active.contains('.xat24cr xdj266r'));
+    if (!allowedContainer) return;
 
     const text = active.innerText || active.value || "";
 
@@ -106,6 +133,7 @@
     sel.removeAllRanges();
     sel.addRange(range);
 
+    // must have or add-on won't work
     document.execCommand("insertText", false, clean);
   }
 
@@ -137,6 +165,13 @@
     if (e.shiftKey && key === "c") {
       e.preventDefault();
       insertCodeBlock();
+      return;
+    }
+
+    // Ctrl + .
+    if (!e.shiftKey && key === ".") {
+      e.preventDefault();
+      insertZwsp();
       return;
     }
 

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Facebook Chat Formatter Hotkeys",
   "author": "Nhân Trí",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "homepage_url": "https://github.com/nhantrichuyenanh/FB-Chat-Formatter-Hotkeys",
   "description": "Use Ctrl / ⌘ + B / I / S / M to wrap your Facebook chat text in *bold*, _italic_, ~strikethrough~, or `monospace`.",
   "icons": {
